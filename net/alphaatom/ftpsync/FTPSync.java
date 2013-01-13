@@ -18,6 +18,7 @@ public class FTPSync {
 	public static double VERSION = 0.1;
 	public static HashMap<String, String> searchPaths;
 	public static ArrayList<FTPPreset> ftpPresets;
+	public static ArrayList<FTPSyncObj> ftpSyncs;
 
 	public static void main(String[] args) {
 		try {
@@ -42,7 +43,7 @@ public class FTPSync {
 		}
 		createDirectories();
 		setDefaultOptions();
-		loadSearchPaths();
+		loadObjectsFromFile();
 		//new FileChangeListener("C:\\Users\\Matt\\GitTest\\textdocument.txt", true);
 		new UserInterfce();
 	}
@@ -52,7 +53,7 @@ public class FTPSync {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private static void loadSearchPaths() {
+	private static void loadObjectsFromFile() {
 		searchPaths = new HashMap<String, String>();
 		Object loadedObject = null;
 		try {
@@ -84,6 +85,22 @@ public class FTPSync {
 			System.out.println("Loaded FTP presets from file.");
 			ftpPresets = (ArrayList<FTPPreset>) loadedObj;
 		}
+		ftpSyncs = new ArrayList<FTPSyncObj>();
+		Object loadedObj2 = null;
+		try {
+			loadedObj2 = FileIO.load("syncs.bin");
+		} catch (FileNotFoundException e) {
+			System.err.println("syncs.bin not found.");
+			return;
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		if (loadedObj2 instanceof ArrayList) {
+			System.out.println("Loaded FTP syncs from file.");
+			ftpSyncs = (ArrayList<FTPSyncObj>) loadedObj2;
+		}
 	}
 	
 	private static void createDirectories() {
@@ -106,6 +123,9 @@ public class FTPSync {
 	}
 	
 	public static String[] getFTPNames() {
+		if (ftpPresets == null) {
+			return null;
+		}
 		int fNumber = ftpPresets.size();
 		String[] names = new String[fNumber];
 		int count = 0;
@@ -117,11 +137,44 @@ public class FTPSync {
 	}
 	
 	public static FTPPreset getPreset(String name) {
+		if (ftpPresets == null) {
+			return null;
+		}
 		for (FTPPreset ftpp : FTPSync.ftpPresets) {
 			if (ftpp.getPresetName().equals(name)) {
 				return ftpp;
 			}
 		}
 		return null;
+	}
+	
+	public static FTPSyncObj getFTPSyncByPath(String path) {
+		if (ftpSyncs == null) {
+			return null;
+		}
+		for (FTPSyncObj ftpo : FTPSync.ftpSyncs) {
+			if (ftpo.getSearchPath().equals(path)) {
+				return ftpo;
+			}
+		}
+		return null;
+	}
+	
+	public static String[] getFTPSyncPaths() {
+		if (ftpSyncs == null) {
+			return null;
+		}
+		int fNumber = ftpSyncs.size();
+		String[] names = new String[fNumber];
+		int count = 0;
+		for (FTPSyncObj ftpo : ftpSyncs) {
+			names[count] = ftpo.getSearchPath();
+			count++;
+		}
+		return names;
+	}
+	
+	public static void updateListeners() {
+		
 	}
 }

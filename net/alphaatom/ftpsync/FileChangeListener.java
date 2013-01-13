@@ -77,6 +77,8 @@ public class FileChangeListener extends Thread {
 					e.printStackTrace();
 				}
 			}
+		} else {
+			//TODO: Add options for folders
 		}
 	}
 

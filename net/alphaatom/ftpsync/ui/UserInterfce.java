@@ -17,7 +17,7 @@ import javax.swing.JButton;
 
 import net.alphaatom.ftpsync.FTPSync;
 import net.alphaatom.ftpsync.FileIO;
-import net.alphaatom.ftpsync.options.FTPPreset;
+import net.alphaatom.ftpsync.options.*;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -101,13 +101,12 @@ public class UserInterfce {
 		btnBrowse.setBounds(348, 6, 90, 28);
 		panel.add(btnBrowse);
 		
-		JButton btnAddFtpsync = new JButton("Add FTPSync");
-		btnAddFtpsync.setBounds(6, 96, 114, 28);
-		panel.add(btnAddFtpsync);
-		
-		JComboBox comboBox_1 = new JComboBox();
+		final JComboBox comboBox_1 = new JComboBox();
 		comboBox_1.setBounds(115, 35, 221, 26);
 		panel.add(comboBox_1);
+		for (int i = 0; i < FTPSync.getFTPNames().length; i++) {
+			comboBox_1.addItem(FTPSync.getFTPNames()[i]);
+		}
 		
 		JLabel lblChooseAnFtp = new JLabel("Choose FTP");
 		lblChooseAnFtp.setBounds(6, 40, 97, 16);
@@ -117,15 +116,63 @@ public class UserInterfce {
 		separator_1.setBounds(6, 133, 432, 2);
 		panel.add(separator_1);
 		
-		JComboBox comboBox_2 = new JComboBox();
+		final JComboBox comboBox_2 = new JComboBox();
 		comboBox_2.setBounds(115, 142, 221, 26);
 		panel.add(comboBox_2);
+		if (FTPSync.getFTPSyncPaths() != null) {
+			for (int i = 0; i < FTPSync.getFTPSyncPaths().length; i++) {
+				comboBox_2.addItem(FTPSync.getFTPSyncPaths()[i]);
+			}
+		}
+		
+		JButton btnAddFtpsync = new JButton("Add FTPSync");
+		btnAddFtpsync.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				String server = (String) comboBox_1.getSelectedItem();
+				if (!textField_4.getText().equals("") && server != null && !textField_5.getText().equals("")) {
+					String searchPath = textField_4.getText();
+					FTPPreset ftpServer = FTPSync.getPreset(server);
+					String pathOnFTP = textField_5.getText();
+					new FTPSyncObj(searchPath, pathOnFTP, ftpServer).save();
+					for (int i = 0; i < FTPSync.getFTPSyncPaths().length; i++) {
+						comboBox_2.addItem(FTPSync.getFTPSyncPaths()[i]);
+					}
+					textField_4.setText("");
+					textField_5.setText("");
+				}
+			}
+		});
+		btnAddFtpsync.setBounds(6, 96, 114, 28);
+		panel.add(btnAddFtpsync);
 		
 		JLabel lblChooseFtpsync = new JLabel("Choose FTPSync");
 		lblChooseFtpsync.setBounds(6, 147, 104, 16);
 		panel.add(lblChooseFtpsync);
 		
 		JButton btnDelete_1 = new JButton("Delete");
+		btnDelete_1.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				String path = (String) comboBox_2.getSelectedItem();
+				FTPSyncObj syncObj = FTPSync.getFTPSyncByPath(path);
+				FTPSync.ftpSyncs.remove(syncObj);
+				comboBox_2.removeAllItems();
+				for (int i = 0; i < FTPSync.getFTPSyncPaths().length; i++) {
+					comboBox_2.addItem(FTPSync.getFTPSyncPaths()[i]);
+				}
+				try {
+					FileIO.save(FTPSync.ftpSyncs, "syncs.bin");
+				} catch (FileNotFoundException e1) {
+					e1.printStackTrace();
+					System.err.println("File not found.");
+				} catch (IOException e1) {
+					e1.printStackTrace();
+					System.err.println("A serious error has occured and FTPSync will exit.");
+					System.exit(0);
+				}
+			}
+		});
 		btnDelete_1.setBounds(6, 175, 90, 28);
 		panel.add(btnDelete_1);
 		
@@ -256,6 +303,10 @@ public class UserInterfce {
 					for (int i = 0; i < FTPSync.getFTPNames().length; i++) {
 						comboBox.addItem(FTPSync.getFTPNames()[i]);
 					}
+					comboBox_1.removeAllItems();
+					for (int i = 0; i < FTPSync.getFTPNames().length; i++) {
+						comboBox_1.addItem(FTPSync.getFTPNames()[i]);
+					}
 				}
 			}
 		});
@@ -277,6 +328,10 @@ public class UserInterfce {
 					comboBox.removeAllItems();
 					for (int i = 0; i < FTPSync.getFTPNames().length; i++) {
 						comboBox.addItem(FTPSync.getFTPNames()[i]);
+					}
+					comboBox_1.removeAllItems();
+					for (int i = 0; i < FTPSync.getFTPNames().length; i++) {
+						comboBox_1.addItem(FTPSync.getFTPNames()[i]);
 					}
 					try {
 						FileIO.save(FTPSync.ftpPresets, "presets\\presets.bin");
