@@ -1,12 +1,16 @@
 package net.alphaatom.ftpsync;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 
 import net.alphaatom.ftpsync.options.*;
 import net.alphaatom.ftpsync.utils.*;
+
+import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPReply;
 
 public class FileChangeListener extends Thread {
 	
@@ -78,6 +82,43 @@ public class FileChangeListener extends Thread {
 							if (!FTPSync.searchPaths.get(path).equals(fileHash)) {
 								System.out.println("File has changed, reuploading to FTP");
 								FTPSync.searchPaths.put(path, fileHash);
+								FTPSyncObj syncSettings = FTPSync.getFTPSyncByPath(path);
+								FTPPreset preset = syncSettings.getFtpPreset();
+								FTPClient ftp = new FTPClient();
+								try {
+									ftp.connect(preset.getServer());
+									if (!FTPReply.isPositiveCompletion(ftp.getReplyCode())) {
+										ftp.disconnect();
+										System.err.println("FTP server refused connection");
+										continue;
+									}
+									ftp.login(preset.getUsername(), preset.getPassword());
+									if (FTPReply.isPositiveCompletion(ftp.cwd(syncSettings.getFtpDirectory()))) {
+										File upload = new File(path);
+										FileInputStream fileInput = new FileInputStream(upload);
+										if (ftp.storeFile(upload.getName(), fileInput)) {
+											System.out.println("Succesfully uploaded file!");
+											fileInput.close();
+										} else {
+											System.err.println("Unable to STOR data. :(");
+											fileInput.close();
+											continue;
+										}
+									} else {
+										System.err.println("FTP Directory does not exist.");
+									}
+								} catch (IOException e) {
+									e.printStackTrace();
+									continue;
+								} finally {
+									if (ftp.isConnected()) {
+										try {
+											ftp.disconnect();
+										} catch (IOException e1) {
+											//nothing to see here.
+										}
+									}
+								}
 							}
 						} else {
 							System.out.println("Adding new file to database.");
