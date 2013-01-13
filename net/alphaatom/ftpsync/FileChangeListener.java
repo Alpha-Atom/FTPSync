@@ -5,12 +5,38 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 
-import net.alphaatom.ftpsync.options.Options;
+import net.alphaatom.ftpsync.options.*;
 
 public class FileChangeListener extends Thread {
 	
+	private FTPSyncObj syncSettings;
 	private String path;
 	private boolean file;
+	private boolean running = true;
+
+	public FTPSyncObj getSyncSettings() {
+		return syncSettings;
+	}
+
+	public void setSyncSettings(FTPSyncObj syncSettings) {
+		this.syncSettings = syncSettings;
+	}
+
+	public String getPath() {
+		return path;
+	}
+
+	public void setPath(String path) {
+		this.path = path;
+	}
+
+	public boolean isFile() {
+		return file;
+	}
+
+	public void setFile(boolean file) {
+		this.file = file;
+	}
 
 	/**
 	 * 
@@ -26,7 +52,7 @@ public class FileChangeListener extends Thread {
 	
 	public void run() {
 		if (file) {
-			while (true) {
+			while (running) {
 				File fileToCheck = new File(path);
 				if (fileToCheck.exists()) {
 					String fileHash = null;
@@ -80,6 +106,15 @@ public class FileChangeListener extends Thread {
 		} else {
 			//TODO: Add options for folders
 		}
+		System.out.println("FileChangeListener ended for " + path);
+	}
+
+	public boolean isRunning() {
+		return running;
+	}
+
+	public void setRunning(boolean running) {
+		this.running = running;
 	}
 
 }

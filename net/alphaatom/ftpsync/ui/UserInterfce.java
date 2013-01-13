@@ -104,8 +104,10 @@ public class UserInterfce {
 		final JComboBox comboBox_1 = new JComboBox();
 		comboBox_1.setBounds(115, 35, 221, 26);
 		panel.add(comboBox_1);
-		for (int i = 0; i < FTPSync.getFTPNames().length; i++) {
-			comboBox_1.addItem(FTPSync.getFTPNames()[i]);
+		if (FTPSync.getFTPNames() != null) {
+			for (int i = 0; i < FTPSync.getFTPNames().length; i++) {
+				comboBox_1.addItem(FTPSync.getFTPNames()[i]);
+			}
 		}
 		
 		JLabel lblChooseAnFtp = new JLabel("Choose FTP");
@@ -157,6 +159,8 @@ public class UserInterfce {
 				String path = (String) comboBox_2.getSelectedItem();
 				FTPSyncObj syncObj = FTPSync.getFTPSyncByPath(path);
 				FTPSync.ftpSyncs.remove(syncObj);
+				FTPSync.listenerTracker.remove(syncObj.getListener());
+				syncObj.getListener().setRunning(false);
 				comboBox_2.removeAllItems();
 				for (int i = 0; i < FTPSync.getFTPSyncPaths().length; i++) {
 					comboBox_2.addItem(FTPSync.getFTPSyncPaths()[i]);
@@ -239,12 +243,14 @@ public class UserInterfce {
 		list_1.setBounds(284, 149, 49, -90);
 		panel_1.add(list_1);
 		
-		final JComboBox comboBox = new JComboBox(FTPSync.getFTPNames());
+		final JComboBox comboBox = new JComboBox();
 		comboBox.setBounds(239, 33, 184, 26);
 		panel_1.add(comboBox);
 		comboBox.removeAllItems();
-		for (int i = 0; i < FTPSync.getFTPNames().length; i++) {
-			comboBox.addItem(FTPSync.getFTPNames()[i]);
+		if (FTPSync.getFTPNames() != null) {
+			for (int i = 0; i < FTPSync.getFTPNames().length; i++) {
+				comboBox.addItem(FTPSync.getFTPNames()[i]);
+			}
 		}
 		
 		JSeparator separator = new JSeparator();

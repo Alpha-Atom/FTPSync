@@ -19,6 +19,7 @@ public class FTPSync {
 	public static HashMap<String, String> searchPaths;
 	public static ArrayList<FTPPreset> ftpPresets;
 	public static ArrayList<FTPSyncObj> ftpSyncs;
+	public static ArrayList<FileChangeListener> listenerTracker = new ArrayList<FileChangeListener>();
 
 	public static void main(String[] args) {
 		try {
@@ -44,7 +45,7 @@ public class FTPSync {
 		createDirectories();
 		setDefaultOptions();
 		loadObjectsFromFile();
-		//new FileChangeListener("C:\\Users\\Matt\\GitTest\\textdocument.txt", true);
+		createListeners();
 		new UserInterfce();
 	}
 	
@@ -59,7 +60,7 @@ public class FTPSync {
 		try {
 			loadedObject = FileIO.load("searchPaths.bin");
 		} catch (FileNotFoundException e) {
-			return;
+			System.err.println("searchPaths.bin not found.");
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -75,7 +76,6 @@ public class FTPSync {
 			loadedObj = FileIO.load("presets\\presets.bin");
 		} catch (FileNotFoundException e) {
 			System.err.println("presets.bin not found.");
-			return;
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -91,7 +91,6 @@ public class FTPSync {
 			loadedObj2 = FileIO.load("syncs.bin");
 		} catch (FileNotFoundException e) {
 			System.err.println("syncs.bin not found.");
-			return;
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -174,7 +173,14 @@ public class FTPSync {
 		return names;
 	}
 	
-	public static void updateListeners() {
-		
+	public static void createListeners() {
+		if (ftpSyncs == null) {
+			return;
+		}
+		for (FTPSyncObj fso : ftpSyncs) {
+			FileChangeListener list = new FileChangeListener(fso.getSearchPath(), !(new File(fso.getSearchPath()).isDirectory()));
+			fso.setListener(list);
+			FTPSync.listenerTracker.add(list);
+		}
 	}
 }
