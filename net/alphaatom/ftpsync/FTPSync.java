@@ -12,6 +12,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 
 import net.alphaatom.ftpsync.options.*;
 import net.alphaatom.ftpsync.ui.*;
+import net.alphaatom.ftpsync.utils.*;
 
 public class FTPSync {
 	

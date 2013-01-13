@@ -1,4 +1,4 @@
-package net.alphaatom.ftpsync;
+package net.alphaatom.ftpsync.utils;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;

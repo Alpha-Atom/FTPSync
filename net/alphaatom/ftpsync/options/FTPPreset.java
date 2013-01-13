@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.io.Serializable;
 
 import net.alphaatom.ftpsync.FTPSync;
-import net.alphaatom.ftpsync.FileIO;
+import net.alphaatom.ftpsync.utils.*;
 
 public class FTPPreset implements Serializable {
 	

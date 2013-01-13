@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 
 import net.alphaatom.ftpsync.options.*;
+import net.alphaatom.ftpsync.utils.*;
 
 public class FileChangeListener extends Thread {
 	

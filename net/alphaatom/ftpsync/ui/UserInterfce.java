@@ -16,7 +16,7 @@ import javax.swing.SwingConstants;
 import javax.swing.JButton;
 
 import net.alphaatom.ftpsync.FTPSync;
-import net.alphaatom.ftpsync.FileIO;
+import net.alphaatom.ftpsync.utils.*;
 import net.alphaatom.ftpsync.options.*;
 
 import java.awt.event.ActionListener;
